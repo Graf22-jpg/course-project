@@ -1,0 +1,19 @@
+{
+  "name": "course-project",
+  "version": "1.0.0",
+  "description": "Курсовий проєкт з дисципліни «Конструювання програмного забезпечення».",
+  "main": "app.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "json-server": "^0.17.4"
+  }
+}

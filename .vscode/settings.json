@@ -1,0 +1,11 @@
+{
+"liveServer.settings.ignoreFiles": [
+    ".vscode/**",
+    "db.json",
+    "package.json",
+    "package-lock.json",
+    "node_modules/**",
+    "docs/**",
+    "**/*.md"
+]
+}
