@@ -1,0 +1,142 @@
+{
+  "books": [
+    {
+      "id": "1",
+      "title": "Основи веброзробки",
+      "author": "Олена Приклад",
+      "category": "Програмування",
+      "year": 2024,
+      "quantity": 3,
+      "available": 2
+    },
+    {
+      "id": "2",
+      "title": "JavaScript для початківців",
+      "author": "Андрій Коденко",
+      "category": "Програмування",
+      "year": 2023,
+      "quantity": 4,
+      "available": 4
+    },
+    {
+      "id": "3",
+      "title": "Бази даних: перші кроки",
+      "author": "Ірина Таблиця",
+      "category": "Бази даних",
+      "year": 2022,
+      "quantity": 2,
+      "available": 1
+    },
+    {
+      "id": "4",
+      "title": "Комп'ютерні мережі",
+      "author": "Петро Мережко",
+      "category": "Мережі",
+      "year": 2021,
+      "quantity": 2,
+      "available": 2
+    },
+    {
+      "id": "5",
+      "title": "Вища математика. Збірник задач",
+      "author": "Марія Числова",
+      "category": "Математика",
+      "year": 2020,
+      "quantity": 5,
+      "available": 5
+    },
+    {
+      "id": "6",
+      "title": "Історія України",
+      "author": "Василь Літописний",
+      "category": "Історія",
+      "year": 2019,
+      "quantity": 3,
+      "available": 3
+    },
+    {
+      "id": "7",
+      "title": "Англійська мова для ІТ",
+      "author": "Ольга Словникова",
+      "category": "Іноземні мови",
+      "year": 2023,
+      "quantity": 1,
+      "available": 0
+    },
+    {
+      "id": "8",
+      "title": "Алгоритми та структури даних",
+      "author": "Тарас Алгоритмов",
+      "category": "Програмування",
+      "year": 2022,
+      "quantity": 2,
+      "available": 2
+    }
+  ],
+  "readers": [
+    {
+      "id": "1",
+      "fullName": "Іван Тестовий",
+      "group": "ІС-23-01",
+      "ticket": "Ч-001"
+    },
+    {
+      "id": "2",
+      "fullName": "Марія Навчальна",
+      "group": "ІС-23-01",
+      "ticket": "Ч-002"
+    },
+    {
+      "id": "3",
+      "fullName": "Олег Прикладний",
+      "group": "ІС(11)-24-02",
+      "ticket": "Ч-003"
+    },
+    {
+      "id": "4",
+      "fullName": "Наталія Зразкова",
+      "group": "ЕП-22-01",
+      "ticket": "Ч-004"
+    },
+    {
+      "id": "5",
+      "fullName": "Андрій Демо",
+      "group": "ІС(11)-24-02",
+      "ticket": "Ч-005"
+    }
+  ],
+  "loans": [
+    {
+      "id": "1",
+      "bookId": "1",
+      "readerId": "1",
+      "issueDate": "2026-10-12",
+      "dueDate": "2026-10-26",
+      "returnDate": null
+    },
+    {
+      "id": "2",
+      "bookId": "3",
+      "readerId": "2",
+      "issueDate": "2026-10-20",
+      "dueDate": "2026-11-03",
+      "returnDate": null
+    },
+    {
+      "id": "3",
+      "bookId": "7",
+      "readerId": "3",
+      "issueDate": "2026-10-22",
+      "dueDate": "2026-11-05",
+      "returnDate": null
+    },
+    {
+      "id": "4",
+      "bookId": "2",
+      "readerId": "4",
+      "issueDate": "2026-09-15",
+      "dueDate": "2026-09-29",
+      "returnDate": "2026-09-27"
+    }
+  ]
+}

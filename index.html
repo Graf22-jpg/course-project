@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Бібліотека коледжу — облік і видача книг</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <div>
+        <h1 class="header__title">Бібліотека коледжу</h1>
+        <p class="header__subtitle">Облік книжкового фонду, видача й повернення книг</p>
+      </div>
+      <nav class="tabs" aria-label="Розділи програми">
+        <button class="tabs__btn is-active" type="button" data-tab="books">Книги</button>
+        <button class="tabs__btn" type="button" data-tab="readers">Читачі</button>
+        <button class="tabs__btn" type="button" data-tab="loans">Видачі</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Повідомлення про результат операцій і помилки -->
+    <div id="message" class="message" role="status" hidden></div>
+
+    <!-- ===================== КНИГИ ===================== -->
+    <section id="tab-books" class="tab-panel">
+      <div class="panel-head">
+        <h2>Каталог книг</h2>
+        <span id="books-count" class="muted"></span>
+      </div>
+
+      <!-- Пошук, сортування, фільтрування (ФВ-08 – ФВ-10), буде реалізовано -->
+      <form class="toolbar" id="books-toolbar" onsubmit="return false">
+        <fieldset disabled>
+          <input type="search" id="search" placeholder="Пошук за назвою або автором">
+          <select id="filter-category" aria-label="Розділ">
+            <option value="">Усі розділи</option>
+          </select>
+          <label class="checkbox">
+            <input type="checkbox" id="filter-available"> лише в наявності
+          </label>
+          <select id="sort" aria-label="Сортування">
+            <option value="title-asc">Назва: А → Я</option>
+            <option value="title-desc">Назва: Я → А</option>
+            <option value="author-asc">Автор: А → Я</option>
+            <option value="year-desc">Рік: новіші</option>
+            <option value="year-asc">Рік: старіші</option>
+          </select>
+        </fieldset>
+        <span class="badge badge--plan">у розробці</span>
+      </form>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>№</th>
+              <th>Назва</th>
+              <th>Автор</th>
+              <th>Розділ</th>
+              <th>Рік</th>
+              <th>Примірники<br><span class="muted">доступно / всього</span></th>
+              <th>Стан</th>
+            </tr>
+          </thead>
+          <tbody id="books-body">
+            <tr><td colspan="7" class="muted center">Завантаження…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Форма додавання / редагування книги (ФВ-02, ФВ-03), буде реалізовано -->
+      <form id="book-form" class="card form" novalidate>
+        <h3>Додати книгу <span class="badge badge--plan">у розробці</span></h3>
+        <fieldset disabled>
+          <label>Назва
+            <input type="text" name="title" required minlength="2" maxlength="150">
+          </label>
+          <label>Автор
+            <input type="text" name="author" required minlength="2" maxlength="100">
+          </label>
+          <label>Розділ
+            <select name="category" required>
+              <option value="">— оберіть —</option>
+              <option>Програмування</option>
+              <option>Бази даних</option>
+              <option>Мережі</option>
+              <option>Математика</option>
+              <option>Історія</option>
+              <option>Іноземні мови</option>
+            </select>
+          </label>
+          <label>Рік видання
+            <input type="number" name="year" min="1900" step="1" required>
+          </label>
+          <label>Кількість примірників
+            <input type="number" name="quantity" min="0" step="1" required>
+          </label>
+          <div class="form__actions">
+            <button type="submit" class="btn btn--primary">Зберегти</button>
+            <button type="reset" class="btn">Очистити</button>
+          </div>
+        </fieldset>
+      </form>
+    </section>
+
+    <!-- ===================== ЧИТАЧІ ===================== -->
+    <section id="tab-readers" class="tab-panel" hidden>
+      <div class="panel-head">
+        <h2>Читачі</h2>
+      </div>
+      <div class="card placeholder">
+        Облік читачів (ФВ-05): таблиця читачів, форма додавання й редагування.
+        <span class="badge badge--plan">у розробці</span>
+      </div>
+    </section>
+
+    <!-- ===================== ВИДАЧІ ===================== -->
+    <section id="tab-loans" class="tab-panel" hidden>
+      <div class="panel-head">
+        <h2>Видачі</h2>
+      </div>
+      <div class="card placeholder">
+        Видача й повернення книг із перевіркою наявності примірника (ФВ-12 – ФВ-15),
+        фільтр активних, повернених і прострочених видач (ФВ-11).
+        <span class="badge badge--plan">у розробці</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      Курсовий проєкт · Турчак Б. Б., ІС-23-01 · 2026
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

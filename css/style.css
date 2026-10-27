@@ -1,0 +1,326 @@
+/* ===== Базові змінні ===== */
+:root {
+  --bg: #f4f5f7;
+  --surface: #ffffff;
+  --text: #1f2933;
+  --muted: #6b7280;
+  --border: #dde1e6;
+  --primary: #2f5d8a;
+  --primary-dark: #244a6e;
+  --success-bg: #e3f4e8;
+  --success: #1e7a3c;
+  --danger-bg: #fbe5e5;
+  --danger: #b42318;
+  --plan-bg: #fff4d6;
+  --plan: #8a6100;
+  --radius: 8px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+}
+
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+h3 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+}
+
+.muted {
+  color: var(--muted);
+  font-weight: normal;
+  font-size: 0.85em;
+}
+
+.center {
+  text-align: center;
+}
+
+/* ===== Шапка ===== */
+.header {
+  background: var(--primary);
+  color: #fff;
+  padding: 16px 0;
+  margin-bottom: 24px;
+}
+
+.header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.header__title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.header__subtitle {
+  margin: 2px 0 0;
+  opacity: 0.85;
+  font-size: 0.9rem;
+}
+
+/* ===== Вкладки ===== */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 4px;
+  border-radius: var(--radius);
+}
+
+.tabs__btn {
+  border: 0;
+  background: transparent;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.tabs__btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.tabs__btn.is-active {
+  background: #fff;
+  color: var(--primary);
+  font-weight: 600;
+}
+
+/* ===== Панелі ===== */
+.tab-panel {
+  margin-bottom: 32px;
+}
+
+.panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.placeholder {
+  color: var(--muted);
+}
+
+/* ===== Повідомлення ===== */
+.message {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+}
+
+.message--error {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.message--success {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+/* ===== Панель пошуку ===== */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.toolbar fieldset {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.toolbar fieldset:disabled {
+  opacity: 0.6;
+}
+
+input,
+select {
+  font: inherit;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+}
+
+input[type="search"] {
+  min-width: 240px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ===== Таблиця ===== */
+.table-wrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+
+.table th {
+  background: #eef1f5;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.table tbody tr:hover {
+  background: #f8fafc;
+}
+
+/* ===== Мітки стану ===== */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge--ok {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.badge--none {
+  background: var(--danger-bg);
+  color: var(--danger);
+}
+
+.badge--plan {
+  background: var(--plan-bg);
+  color: var(--plan);
+  font-weight: 500;
+}
+
+/* ===== Форма ===== */
+.form fieldset {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.form fieldset:disabled {
+  opacity: 0.6;
+}
+
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.form__actions {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.btn {
+  font: inherit;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.btn--primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--primary-dark);
+}
+
+/* ===== Підвал ===== */
+.footer {
+  padding: 16px 0 24px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+/* ===== Мобільні екрани ===== */
+@media (max-width: 600px) {
+  .header__inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  input[type="search"] {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .toolbar fieldset {
+    width: 100%;
+  }
+}
