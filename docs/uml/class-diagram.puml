@@ -1,0 +1,87 @@
+@startuml class-diagram
+' Діаграма класів предметної області
+' Відповідає колекціям db.json (books, readers, loans) і правилам у app.js
+
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam classBorderColor #333333
+skinparam classBackgroundColor #F7F9FC
+skinparam classHeaderBackgroundColor #E6EEF7
+skinparam ArrowColor #333333
+skinparam noteBorderColor #999999
+skinparam noteBackgroundColor #FFFBEA
+skinparam classAttributeIconSize 0
+hide empty methods
+
+class Book <<books>> {
+  + id : string
+  + title : string
+  + author : string
+  + category : string
+  + year : number
+  + quantity : number
+  + available : number
+}
+
+class Reader <<readers>> {
+  + id : string
+  + fullName : string
+  + group : string
+  + ticket : string
+}
+
+class Loan <<loans>> {
+  + id : string
+  + bookId : string
+  + readerId : string
+  + issueDate : string
+  + dueDate : string
+  + returnDate : string | null
+}
+
+enum LoanStatus {
+  active
+  overdue
+  returned
+}
+
+Book "1" -- "0..*" Loan : видається за >
+Reader "1" -- "0..*" Loan : отримує >
+Loan ..> LoanStatus : стан обчислюється\nз дат >
+
+note right of Book
+  **Головне правило:**
+  0 ≤ available ≤ quantity,
+  обидва — цілі числа.
+  Видача можлива лише
+  якщо available > 0.
+  ----
+  year: 1900 … поточний рік
+  category: зі списку розділів
+  (title + author) — унікальні
+end note
+
+note right of Reader
+  ticket — унікальний,
+  формат «Ч-001»
+  ----
+  Не можна видалити,
+  якщо є неповернені книги
+end note
+
+note bottom of Loan
+  dueDate ≥ issueDate (типово +14 днів)
+  returnDate = null — книга на руках
+  Один читач не може мати дві активні
+  видачі тієї самої книги
+end note
+
+note bottom of LoanStatus
+  active — на руках, строк не минув
+  overdue — на руках, dueDate минула
+  returned — returnDate заповнено
+end note
+
+@enduml

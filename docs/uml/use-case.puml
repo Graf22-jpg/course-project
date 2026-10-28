@@ -1,0 +1,78 @@
+@startuml use-case
+' Діаграма прецедентів (варіантів використання)
+' Вебзастосунок обліку та видачі книг бібліотеки коледжу
+
+left to right direction
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam ArrowColor #333333
+skinparam actorBorderColor #333333
+skinparam actorBackgroundColor white
+skinparam usecaseBorderColor #333333
+skinparam usecaseBackgroundColor #F7F9FC
+skinparam rectangleBorderColor #333333
+skinparam packageBorderColor #777777
+skinparam packageBackgroundColor white
+skinparam ArrowFontSize 11
+skinparam ArrowFontColor #444444
+skinparam linetype polyline
+skinparam nodesep 18
+skinparam ranksep 60
+
+actor "Бібліотекар" as Librarian
+
+rectangle "Вебзастосунок бібліотеки коледжу" {
+
+    usecase "Переглянути\nкаталог книг" as UC1
+    usecase "Додати книгу" as UC4
+    usecase "Редагувати книгу" as UC5
+    usecase "Видалити книгу" as UC6
+    usecase "Знайти книгу за\nназвою або автором" as UC2
+    usecase "Фільтрувати та\nсортувати каталог" as UC3
+
+    usecase "Переглянути та\nзнайти читача" as UC7
+    usecase "Додати читача" as UC8
+    usecase "Редагувати читача" as UC9
+    usecase "Видалити читача" as UC10
+
+    usecase "Переглянути видачі\n(активні, прострочені,\nповернені)" as UC13
+    usecase "Видати книгу" as UC11
+    usecase "Повернути книгу" as UC12
+    usecase "Перевірити наявність\nвільного примірника" as CHK_AVAIL
+    usecase "Повідомити про\nвідмову у видачі" as DENY
+
+  usecase "Перевірити\nвведені дані" as CHK_INPUT
+  usecase "Перевірити\nактивні видачі" as CHK_LOANS
+}
+
+Librarian --> UC1
+Librarian --> UC4
+Librarian --> UC5
+Librarian --> UC6
+Librarian --> UC7
+Librarian --> UC8
+Librarian --> UC9
+Librarian --> UC10
+Librarian --> UC13
+Librarian --> UC11
+Librarian --> UC12
+
+UC1 <.. UC2 : <<extend>>
+UC1 <.. UC3 : <<extend>>
+
+UC11 ..> CHK_AVAIL : <<include>>
+UC11 <.. DENY : <<extend>>\n[немає вільних\nпримірників]
+
+UC4 ..> CHK_INPUT : <<include>>
+UC5 ..> CHK_INPUT : <<include>>
+UC8 ..> CHK_INPUT : <<include>>
+UC9 ..> CHK_INPUT : <<include>>
+UC11 ..> CHK_INPUT : <<include>>
+
+UC5 ..> CHK_LOANS : <<include>>
+UC6 ..> CHK_LOANS : <<include>>
+UC10 ..> CHK_LOANS : <<include>>
+
+@enduml

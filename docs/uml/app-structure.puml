@@ -1,0 +1,95 @@
+@startuml app-structure
+' Діаграма класів: структура модулів app.js
+' Кожен «клас» — розділ app.js із реальними назвами функцій
+
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam classBorderColor #333333
+skinparam classBackgroundColor #F7F9FC
+skinparam classHeaderBackgroundColor #E6EEF7
+skinparam ArrowColor #333333
+skinparam packageBorderColor #777777
+skinparam packageBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 40
+skinparam ranksep 50
+hide circle
+
+package "Інтерфейс (обробники подій і відображення)" as UI {
+  class BooksView <<module>> {
+    + getVisibleBooks() : Book[]
+    + renderBooks()
+    + startEditBook(id)
+    + resetBookForm()
+    + handleBookSubmit(event)
+    + deleteBook(id)
+  }
+
+  class ReadersView <<module>> {
+    + renderReaders()
+    + startEditReader(id)
+    + resetReaderForm()
+    + handleReaderSubmit(event)
+    + deleteReader(id)
+  }
+
+  class LoansView <<module>> {
+    + renderLoans()
+    + renderLoanSelects()
+    + resetLoanForm()
+    + handleLoanSubmit(event)
+    + returnBook(loanId)
+  }
+}
+
+class State <<module>> {
+  + books : Book[]
+  + readers : Reader[]
+  + loans : Loan[]
+  + editingBookId : string | null
+  + editingReaderId : string | null
+  --
+  + loadAll() : boolean
+  + renderAll()
+}
+
+class DomainRules <<module>> {
+  + isActiveLoan(loan) : boolean
+  + getLoanStatus(loan) : LoanStatus
+  + countActiveLoansOfBook(bookId) : number
+  + countActiveLoansOfReader(readerId) : number
+  + validateBook(data, issuedCount) : Errors
+  + validateReader(data) : Errors
+  + validateLoanForm(data) : Errors
+}
+
+class Api <<module>> {
+  + SERVER_URL = "http://localhost:5000"
+  --
+  - request(path, options) : Promise
+  + getAll(collection) : Promise<array>
+  + getOne(collection, id) : Promise<object>
+  + create(collection, data) : Promise<object>
+  + update(collection, id, data) : Promise<object>
+  + remove(collection, id) : Promise
+}
+
+class "JSON Server\n(db.json)" as Server <<external>> {
+  /books
+  /readers
+  /loans
+}
+
+BooksView -[hidden]right- ReadersView
+ReadersView -[hidden]right- LoansView
+
+UI ..> State : читає дані,\nвикликає loadAll()
+UI ..> DomainRules : перевіряє\nвведення й правила
+UI ..> Api : POST / PATCH /\nDELETE
+State ..> Api : loadAll()
+DomainRules ..> State : читає loans
+Api ..> Server : HTTP\nGET / POST /\nPATCH / DELETE
+
+@enduml
