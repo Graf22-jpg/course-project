@@ -1,0 +1,28 @@
+@startuml request-states
+' Діаграма станів заявки — основа патерна State
+
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 13
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam ArrowColor #333333
+skinparam stateBorderColor #333333
+skinparam stateBackgroundColor #F7F9FC
+skinparam ArrowFontSize 12
+
+state "Нова\n(new)" as New
+state "Схвалена\n(approved)" as Approved : книгу відкладено
+state "Видана\n(issued)" as Issued : строк = видача + 14 днів
+state "Повернена\n(returned)" as Returned
+state "Відхилена\n(rejected)" as Rejected
+
+[*] --> New : читач подає заявку\n(POST /requests)
+New --> Approved : Схвалити\n[available > 0]\n/ available − 1
+New --> Rejected : Відхилити
+Approved --> Issued : Видати
+Approved --> Rejected : Відхилити\n/ available + 1
+Issued --> Returned : Прийняти повернення\n/ available + 1
+Returned --> [*]
+Rejected --> [*]
+
+@enduml

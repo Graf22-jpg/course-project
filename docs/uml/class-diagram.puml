@@ -1,6 +1,5 @@
 @startuml class-diagram
-' Діаграма класів предметної області
-' Відповідає колекціям db.json (books, readers, loans) і правилам у app.js
+' Діаграма класів предметної області — колекції db.json
 
 skinparam defaultFontName "DejaVu Sans"
 skinparam defaultFontSize 13
@@ -32,56 +31,54 @@ class Reader <<readers>> {
   + ticket : string
 }
 
-class Loan <<loans>> {
+class Request <<requests>> {
   + id : string
   + bookId : string
   + readerId : string
-  + issueDate : string
-  + dueDate : string
+  + comment : string
+  + status : RequestStatus
+  + createdAt : string
+  + decisionDate : string | null
+  + issueDate : string | null
+  + dueDate : string | null
   + returnDate : string | null
+  + rejectReason : string | null
 }
 
-enum LoanStatus {
-  active
-  overdue
+enum RequestStatus {
+  new
+  approved
+  issued
   returned
+  rejected
 }
 
-Book "1" -- "0..*" Loan : видається за >
-Reader "1" -- "0..*" Loan : отримує >
-Loan ..> LoanStatus : стан обчислюється\nз дат >
+Book "1" -- "0..*" Request : на книгу <
+Reader "1" -- "0..*" Request : подає >
+Request --> RequestStatus
 
 note right of Book
   **Головне правило:**
-  0 ≤ available ≤ quantity,
-  обидва — цілі числа.
-  Видача можлива лише
+  0 ≤ available ≤ quantity (цілі).
+  Схвалити заявку можна лише,
   якщо available > 0.
   ----
-  year: 1900 … поточний рік
-  category: зі списку розділів
-  (title + author) — унікальні
+  available = quantity − заявки
+  у статусах approved та issued
 end note
 
 note right of Reader
-  ticket — унікальний,
-  формат «Ч-001»
-  ----
-  Не можна видалити,
-  якщо є неповернені книги
+  ticket — унікальний, «Ч-001».
+  Не більше 3 незавершених
+  заявок одночасно.
 end note
 
-note bottom of Loan
-  dueDate ≥ issueDate (типово +14 днів)
-  returnDate = null — книга на руках
-  Один читач не може мати дві активні
-  видачі тієї самої книги
-end note
-
-note bottom of LoanStatus
-  active — на руках, строк не минув
-  overdue — на руках, dueDate минула
-  returned — returnDate заповнено
+note bottom of Request
+  Нова заявка: status = new.
+  Один читач — не більше однієї
+  незавершеної заявки на ту саму книгу.
+  «Прострочена» = issued і dueDate < сьогодні
+  (обчислюється, не зберігається).
 end note
 
 @enduml

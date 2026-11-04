@@ -1,19 +1,14 @@
 {
   "name": "course-project",
-  "version": "1.0.0",
-  "description": "Курсовий проєкт з дисципліни «Конструювання програмного забезпечення».",
-  "main": "app.js",
-  "directories": {
-    "doc": "docs"
-  },
+  "version": "0.3.0",
+  "description": "Вебзастосунок обліку та видачі книг бібліотеки коледжу (курсовий проєкт КПЗ).",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "server": "json-server --watch db.json --port 5000"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Турчак Богдан Богданович, ІС-23-01",
   "license": "ISC",
-  "type": "commonjs",
   "devDependencies": {
-    "json-server": "^0.17.4"
+    "json-server": "0.17.4"
   }
 }

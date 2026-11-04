@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Бібліотека коледжу — для читачів</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header__inner">
+      <div>
+        <h1 class="header__title">Бібліотека коледжу</h1>
+        <p class="header__subtitle">Каталог книг і заявки для читачів</p>
+      </div>
+      <nav class="tabs" aria-label="Розділи сторінки">
+        <a class="tabs__btn" href="#catalog">Каталог</a>
+        <a class="tabs__btn" href="#request">Подати заявку</a>
+        <a class="tabs__btn" href="#status">Мої заявки</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Повідомлення про результат дій і помилки -->
+    <div id="message" class="message" role="status" aria-live="polite" hidden></div>
+
+    <!-- ===================== КАТАЛОГ ===================== -->
+    <section id="catalog" class="section">
+      <div class="panel-head">
+        <h2>Каталог книг</h2>
+        <span id="books-count" class="muted"></span>
+        <div class="panel-head__actions">
+          <button type="button" class="btn" id="books-refresh">Оновити</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <label class="visually-hidden" for="book-search">Пошук книги</label>
+        <input type="search" id="book-search" placeholder="Пошук за назвою або автором">
+        <label class="visually-hidden" for="book-filter-category">Розділ</label>
+        <select id="book-filter-category">
+          <option value="">Усі розділи</option>
+        </select>
+        <label class="checkbox">
+          <input type="checkbox" id="book-filter-available"> лише в наявності
+        </label>
+        <label class="visually-hidden" for="book-sort">Сортування</label>
+        <select id="book-sort">
+          <option value="title-asc">Назва: А → Я</option>
+          <option value="title-desc">Назва: Я → А</option>
+          <option value="author-asc">Автор: А → Я</option>
+          <option value="year-desc">Рік: спочатку новіші</option>
+          <option value="year-asc">Рік: спочатку старіші</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Назва</th>
+              <th>Автор</th>
+              <th>Розділ</th>
+              <th>Рік</th>
+              <th>Наявність</th>
+              <th>Дія</th>
+            </tr>
+          </thead>
+          <tbody id="books-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== ФОРМА ЗАЯВКИ ===================== -->
+    <section id="request" class="section">
+      <form id="request-form" class="card" novalidate>
+        <h3>Заявка на книгу</h3>
+        <p class="hint">
+          Оберіть книгу і вкажіть номер читацького квитка. Після схвалення бібліотекарем
+          книга чекатиме на вас у бібліотеці. Строк користування — 14 днів.
+        </p>
+        <div class="form__grid">
+          <label class="field">Книга
+            <select name="bookId" id="request-book">
+              <option value="">— оберіть книгу —</option>
+            </select>
+            <span class="field-error" data-error-for="bookId"></span>
+          </label>
+          <label class="field">Номер читацького квитка
+            <input type="text" name="ticket" maxlength="10" placeholder="Ч-001" autocomplete="off">
+            <span class="field-error" data-error-for="ticket"></span>
+          </label>
+          <label class="field field--wide">Коментар для бібліотекаря (необов'язково)
+            <textarea name="comment" maxlength="200" placeholder="Наприклад: заберу в понеділок"></textarea>
+            <span class="field-error" data-error-for="comment"></span>
+          </label>
+        </div>
+        <div class="form__actions">
+          <button type="submit" class="btn btn--primary">Надіслати заявку</button>
+          <button type="reset" class="btn">Очистити</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ===================== СТАТУС ЗАЯВОК ===================== -->
+    <section id="status" class="section">
+      <div class="panel-head">
+        <h2>Мої заявки</h2>
+      </div>
+
+      <form id="status-form" class="card" novalidate>
+        <div class="form__grid">
+          <label class="field">Номер читацького квитка
+            <input type="text" name="ticket" maxlength="10" placeholder="Ч-001" autocomplete="off">
+            <span class="field-error" data-error-for="ticket"></span>
+          </label>
+        </div>
+        <div class="form__actions">
+          <button type="submit" class="btn btn--primary">Показати заявки</button>
+          <button type="button" class="btn" id="status-refresh" disabled>Оновити</button>
+        </div>
+      </form>
+
+      <p id="status-reader" class="reader-info" hidden></p>
+
+      <div class="table-wrap" id="status-table" hidden>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>№</th>
+              <th>Книга</th>
+              <th>Подано</th>
+              <th>Статус</th>
+              <th>Деталі</th>
+            </tr>
+          </thead>
+          <tbody id="status-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      Курсовий проєкт · Турчак Б. Б., ІС-23-01 · 2026 ·
+      <a href="index.html">На головну</a> · <a href="admin.html">Сторінка бібліотекаря</a>
+    </div>
+  </footer>
+
+  <script type="module" src="js/client.js"></script>
+</body>
+</html>

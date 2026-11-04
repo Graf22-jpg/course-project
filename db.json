@@ -34,7 +34,7 @@
       "category": "Мережі",
       "year": 2021,
       "quantity": 2,
-      "available": 2
+      "available": 1
     },
     {
       "id": "5",
@@ -103,46 +103,99 @@
       "fullName": "Андрій Демо",
       "group": "ІС(11)-24-02",
       "ticket": "Ч-005"
-    },
-    {
-      "fullName": "піб",
-      "group": "ів",
-      "ticket": "Ч-006",
-      "id": "DmCLkPN"
     }
   ],
-  "loans": [
+  "requests": [
     {
       "id": "1",
       "bookId": "1",
       "readerId": "1",
+      "comment": "",
+      "status": "issued",
+      "createdAt": "2026-10-10",
+      "decisionDate": "2026-10-11",
       "issueDate": "2026-10-12",
       "dueDate": "2026-10-26",
-      "returnDate": null
+      "returnDate": null,
+      "rejectReason": null
     },
     {
       "id": "2",
       "bookId": "3",
       "readerId": "2",
-      "issueDate": "2026-10-20",
-      "dueDate": "2026-11-03",
-      "returnDate": null
+      "comment": "Потрібна для курсової з баз даних",
+      "status": "issued",
+      "createdAt": "2026-10-27",
+      "decisionDate": "2026-10-27",
+      "issueDate": "2026-10-28",
+      "dueDate": "2026-11-11",
+      "returnDate": null,
+      "rejectReason": null
     },
     {
       "id": "3",
       "bookId": "7",
       "readerId": "3",
+      "comment": "",
+      "status": "issued",
+      "createdAt": "2026-10-21",
+      "decisionDate": "2026-10-21",
       "issueDate": "2026-10-22",
       "dueDate": "2026-11-05",
-      "returnDate": null
+      "returnDate": null,
+      "rejectReason": null
     },
     {
       "id": "4",
       "bookId": "2",
       "readerId": "4",
+      "comment": "",
+      "status": "returned",
+      "createdAt": "2026-09-14",
+      "decisionDate": "2026-09-14",
       "issueDate": "2026-09-15",
       "dueDate": "2026-09-29",
-      "returnDate": "2026-09-27"
+      "returnDate": "2026-09-27",
+      "rejectReason": null
+    },
+    {
+      "id": "5",
+      "bookId": "4",
+      "readerId": "1",
+      "comment": "Заберу в понеділок",
+      "status": "approved",
+      "createdAt": "2026-11-01",
+      "decisionDate": "2026-11-02",
+      "issueDate": null,
+      "dueDate": null,
+      "returnDate": null,
+      "rejectReason": null
+    },
+    {
+      "id": "6",
+      "bookId": "5",
+      "readerId": "5",
+      "comment": "",
+      "status": "new",
+      "createdAt": "2026-11-03",
+      "decisionDate": null,
+      "issueDate": null,
+      "dueDate": null,
+      "returnDate": null,
+      "rejectReason": null
+    },
+    {
+      "id": "7",
+      "bookId": "6",
+      "readerId": "2",
+      "comment": "",
+      "status": "rejected",
+      "createdAt": "2026-10-15",
+      "decisionDate": "2026-10-16",
+      "issueDate": null,
+      "dueDate": null,
+      "returnDate": null,
+      "rejectReason": "Читач не прийшов по книгу протягом 3 днів"
     }
   ]
 }

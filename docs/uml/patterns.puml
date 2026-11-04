@@ -1,0 +1,91 @@
+@startuml patterns
+' Учасники та зв'язки патернів Repository і State
+
+skinparam defaultFontName "DejaVu Sans"
+skinparam defaultFontSize 12
+skinparam shadowing false
+skinparam backgroundColor white
+skinparam classBorderColor #333333
+skinparam classBackgroundColor #F7F9FC
+skinparam classHeaderBackgroundColor #E6EEF7
+skinparam ArrowColor #333333
+skinparam packageBorderColor #777777
+skinparam packageBackgroundColor white
+skinparam classAttributeIconSize 0
+skinparam nodesep 35
+skinparam ranksep 45
+hide circle
+set separator none
+hide empty members
+
+package "Клієнти (код інтерфейсу)" as UI {
+  class "client.js" as ClientPage <<module>> {
+    + loadBooks()
+    + handleRequestSubmit()
+    + showReaderRequests(ticket)
+  }
+  class "admin.js" as AdminPage <<module>> {
+    + loadAll()
+    + changeStatus(id, next)
+    + handleBookSubmit()
+    + deleteBook(id)
+  }
+}
+
+package "Repository — js/repository.js" {
+  class LibraryRepository {
+    - request : httpRequest
+    --
+    + getBooks() / getBook(id)
+    + createBook() / updateBook() / deleteBook()
+    + changeAvailability(bookId, delta)
+    + getReaders() / findReaderByTicket(ticket)
+    + createReader() / updateReader() / deleteReader()
+    + getRequests() / getRequest(id)
+    + getRequestsByReader(readerId)
+    + createRequest(data)
+    + updateRequestStatus(id, changes)
+  }
+  class "httpRequest()" as Http <<js/http.js>> {
+    fetch + перевірка response.ok
+  }
+  class "JSON Server\n(db.json)" as Server <<external>>
+}
+
+package "State — js/request-state.js" {
+  class RequestStatusContext <<Context>> {
+    - request : Request
+    - state : RequestState
+    --
+    + availableActions() : string[]
+    + changeTo(next, {book, today, reason})
+  }
+  abstract class RequestState <<State>> {
+    + code : string
+    --
+    + nextStatuses() : string[]
+    + canChangeTo(next) : boolean
+    + changeTo(next, ctx) : {changes, stockDelta}
+    # buildChange(next, ctx)
+  }
+  class NewState
+  class ApprovedState
+  class IssuedState
+  class ReturnedState
+  class RejectedState
+}
+
+ClientPage ..> LibraryRepository : використовує
+AdminPage ..> LibraryRepository : використовує
+AdminPage ..> RequestStatusContext : зміна статусу
+LibraryRepository --> Http
+Http ..> Server : GET / POST /\nPATCH / DELETE
+
+RequestStatusContext o--> RequestState : поточний стан
+RequestState <|-- NewState
+RequestState <|-- ApprovedState
+RequestState <|-- IssuedState
+RequestState <|-- ReturnedState
+RequestState <|-- RejectedState
+
+@enduml
