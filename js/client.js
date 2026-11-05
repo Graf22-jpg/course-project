@@ -1,17 +1,17 @@
 // =====================================================================
 // Сторінка читача (client.html)
-// Етап 3: каталог і статус заявок через GET, форма заявки з перевіркою полів
+// Каталог → вибір книги → заявка (POST) → перегляд статусу (GET)
 // =====================================================================
 
-import { CATEGORIES } from "./config.js";
+import { CATEGORIES, MAX_ACTIVE_REQUESTS } from "./config.js";
 import { httpRequest } from "./http.js";
-import { LibraryRepository } from "./repository.js";
+import { LibraryRepository, ACTIVE_STATUSES } from "./repository.js";
 import { isOverdue } from "./request-state.js";
 import { escapeHtml, formatDate, todayISO, compareText } from "./utils.js";
 import { validateRequestForm, validateTicket, normalizeTicket, hasErrors } from "./validation.js";
 import {
   $, showMessage, hideMessage, showLoading, showEmpty, showLoadError,
-  showFieldErrors, clearFieldErrors, statusBadge,
+  showFieldErrors, clearFieldErrors, setFormBusy, statusBadge,
 } from "./ui.js";
 
 const repository = new LibraryRepository(httpRequest);
@@ -119,7 +119,7 @@ function renderBookSelect() {
 // Заявка (POST /requests)
 // =====================================================================
 
-function handleRequestSubmit(event) {
+async function handleRequestSubmit(event) {
   event.preventDefault();
   const form = event.target;
 
@@ -135,8 +135,61 @@ function handleRequestSubmit(event) {
     showMessage("Перевірте поля форми заявки.");
     return;
   }
-  // Етап 4: перевірка читача й наявності на сервері та POST /requests
-  showMessage("Форма заповнена правильно. Надсилання заявки (POST) буде підключено на етапі 4.", "info");
+
+  setFormBusy(form, true);
+  try {
+    // Актуальні дані з сервера: читач, книга і його заявки
+    const reader = await repository.findReaderByTicket(data.ticket);
+    if (!reader) {
+      showFieldErrors(form, { ticket: "Читача з таким квитком не знайдено. Зверніться до бібліотекаря." });
+      showMessage("Заявку не створено: читацький квиток не знайдено.");
+      return;
+    }
+
+    const [book, readerRequests] = await Promise.all([
+      repository.getBook(data.bookId),
+      repository.getRequestsByReader(reader.id),
+    ]);
+
+    if (!(book.available > 0)) {
+      showFieldErrors(form, { bookId: "Вільних примірників уже немає." });
+      showMessage(`Заявку не створено: немає вільних примірників книги «${book.title}».`);
+      await loadBooks();
+      return;
+    }
+
+    const active = readerRequests.filter((r) => ACTIVE_STATUSES.includes(r.status));
+    if (active.some((r) => r.bookId === book.id)) {
+      showFieldErrors(form, { bookId: "У вас уже є незавершена заявка на цю книгу." });
+      showMessage(`Заявку не створено: у вас уже є заявка на «${book.title}».`);
+      return;
+    }
+    if (active.length >= MAX_ACTIVE_REQUESTS) {
+      showFieldErrors(form, { ticket: `Не більше ${MAX_ACTIVE_REQUESTS} активних заявок і книг на руках.` });
+      showMessage(`Заявку не створено: досягнуто ліміт — ${MAX_ACTIVE_REQUESTS} книги одночасно.`);
+      return;
+    }
+
+    const created = await repository.createRequest({
+      bookId: book.id,
+      readerId: reader.id,
+      comment: data.comment,
+    });
+
+    // Підтвердження — лише після успішної відповіді сервера
+    showMessage(
+      `Заявку №${created.id} на книгу «${book.title}» прийнято. Статус: нова. ` +
+        `Слідкуйте за статусом у розділі «Мої заявки».`,
+      "success"
+    );
+    form.reset();
+    clearFieldErrors(form);
+    await showReaderRequests(data.ticket);
+  } catch (error) {
+    showMessage(error.message);
+  } finally {
+    setFormBusy(form, false);
+  }
 }
 
 // =====================================================================

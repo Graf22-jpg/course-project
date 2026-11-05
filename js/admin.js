@@ -1,19 +1,18 @@
 // =====================================================================
 // Сторінка бібліотекаря (admin.html)
-// Етап 3: заявки, книги й читачі завантажуються через GET (Repository);
-// форми перевіряють поля, діалог підтверджує видалення.
-// Запис даних (POST, PATCH, DELETE) і патерн State — етап 4.
+// Заявки: зміна статусу через патерн State (PATCH)
+// Книги і читачі: GET, POST, PATCH, DELETE через Repository
 // =====================================================================
 
 import { CATEGORIES } from "./config.js";
 import { httpRequest } from "./http.js";
 import { LibraryRepository, ACTIVE_STATUSES, HOLDING_STATUSES } from "./repository.js";
-import { isOverdue } from "./request-state.js";
+import { RequestStatusContext, ACTION_LABELS, isOverdue } from "./request-state.js";
 import { escapeHtml, formatDate, todayISO, parseInteger, compareText } from "./utils.js";
 import { validateBook, validateReader, normalizeTicket, hasErrors } from "./validation.js";
 import {
   $, showMessage, hideMessage, showLoading, showEmpty, showLoadError,
-  showFieldErrors, clearFieldErrors, statusBadge, confirmDialog,
+  showFieldErrors, clearFieldErrors, setFormBusy, statusBadge, confirmDialog,
 } from "./ui.js";
 
 const repository = new LibraryRepository(httpRequest);
@@ -128,7 +127,14 @@ function renderRequests() {
     .map((request) => {
       const book = findBook(request.bookId);
       const reader = findReader(request.readerId);
-      const actions = ""; // Етап 4: кнопки допустимих переходів (патерн State)
+      const actions = new RequestStatusContext(request)
+        .availableActions()
+        .map((next) => {
+          const cls = next === "rejected" ? "btn--danger" : "btn--admin";
+          return `<button type="button" class="btn btn--small ${cls}" data-id="${escapeHtml(request.id)}"
+                    data-next="${next}">${ACTION_LABELS[next]}</button>`;
+        })
+        .join("");
 
       return `
         <tr>
@@ -142,10 +148,61 @@ function renderRequests() {
           }</div></td>
           <td data-label="Статус">${statusBadge(request, today)}</td>
           <td data-label="Деталі">${escapeHtml(requestDetails(request, today))}</td>
-          <td data-label="Дії"><div class="actions">${actions || '<span class="muted">—</span>'}</div></td>
+          <td data-label="Дії"><div class="actions">${actions || '<span class="muted">завершено</span>'}</div></td>
         </tr>`;
     })
     .join("");
+}
+
+// Зміна статусу: State перевіряє перехід, Repository зберігає зміни
+async function changeStatus(requestId, next, button) {
+  let reason = "";
+  if (next === "rejected") {
+    const answer = await confirmDialog({
+      title: `Відхилити заявку №${requestId}?`,
+      text: "Читач побачить статус «відхилена» і причину, якщо ви її вкажете.",
+      confirmLabel: "Відхилити",
+      danger: true,
+      withReason: true,
+    });
+    if (!answer.confirmed) return;
+    reason = answer.reason;
+  }
+
+  const row = button.closest("tr");
+  row.querySelectorAll("button").forEach((b) => (b.disabled = true));
+
+  try {
+    // Актуальний стан заявки й книги з сервера, а не з пам'яті сторінки
+    const request = await repository.getRequest(requestId);
+    const book = await repository.getBook(request.bookId);
+    const reader = findReader(request.readerId);
+
+    const context = new RequestStatusContext(request);
+    const { changes, stockDelta } = context.changeTo(next, { book, today: todayISO(), reason });
+
+    if (stockDelta !== 0) await repository.changeAvailability(book.id, stockDelta);
+    try {
+      await repository.updateRequestStatus(requestId, changes);
+    } catch (error) {
+      // Повертаємо кількість примірників, щоб дані не розійшлися
+      if (stockDelta !== 0) await repository.changeAvailability(book.id, -stockDelta).catch(() => {});
+      throw error;
+    }
+
+    const who = reader ? reader.fullName : "—";
+    const texts = {
+      approved: `Заявку №${requestId} схвалено: примірник «${book.title}» відкладено. Читач: ${who}.`,
+      issued: `Книгу «${book.title}» видано. Читач: ${who}, повернути до ${formatDate(changes.dueDate)}.`,
+      returned: `Книгу «${book.title}» повернено до бібліотеки.`,
+      rejected: `Заявку №${requestId} відхилено.`,
+    };
+    showMessage(texts[next], "success");
+  } catch (error) {
+    showMessage(error.message);
+  } finally {
+    await loadAll();
+  }
 }
 
 // =====================================================================
@@ -258,8 +315,23 @@ async function handleBookSubmit(event) {
     return;
   }
 
-  // Етап 4: POST /books або PATCH /books/:id через Repository
-  showMessage("Дані книги коректні. Збереження (POST/PATCH) буде підключено на етапі 4.", "info");
+  setFormBusy(form, true);
+  try {
+    if (editingId) {
+      // Доступні = усього − зарезервовані та видані
+      await repository.updateBook(editingId, { ...data, available: data.quantity - reserved });
+      showMessage(`Зміни в книзі «${data.title}» збережено.`, "success");
+    } else {
+      await repository.createBook(data);
+      showMessage(`Книгу «${data.title}» додано до каталогу.`, "success");
+    }
+    resetBookForm();
+    await loadAll();
+  } catch (error) {
+    showMessage(error.message);
+  } finally {
+    setFormBusy(form, false);
+  }
 }
 
 // Правило: книгу з незавершеними заявками видаляти не можна;
@@ -281,8 +353,14 @@ async function deleteBook(id) {
   });
   if (!answer.confirmed) return;
 
-  // Етап 4: DELETE /books/:id через Repository
-  showMessage("Видалення (DELETE) буде підключено на етапі 4.", "info");
+  try {
+    await repository.deleteBook(id);
+    if (state.editingBookId === id) resetBookForm();
+    showMessage(`Книгу «${book.title}» видалено.`, "success");
+  } catch (error) {
+    showMessage(error.message);
+  }
+  await loadAll();
 }
 
 // =====================================================================
@@ -373,8 +451,22 @@ async function handleReaderSubmit(event) {
     return;
   }
 
-  // Етап 4: POST /readers або PATCH /readers/:id через Repository
-  showMessage("Дані читача коректні. Збереження (POST/PATCH) буде підключено на етапі 4.", "info");
+  setFormBusy(form, true);
+  try {
+    if (state.editingReaderId) {
+      await repository.updateReader(state.editingReaderId, data);
+      showMessage(`Дані читача «${data.fullName}» збережено.`, "success");
+    } else {
+      await repository.createReader(data);
+      showMessage(`Читача «${data.fullName}» додано.`, "success");
+    }
+    resetReaderForm();
+    await loadAll();
+  } catch (error) {
+    showMessage(error.message);
+  } finally {
+    setFormBusy(form, false);
+  }
 }
 
 async function deleteReader(id) {
@@ -393,8 +485,14 @@ async function deleteReader(id) {
   });
   if (!answer.confirmed) return;
 
-  // Етап 4: DELETE /readers/:id через Repository
-  showMessage("Видалення (DELETE) буде підключено на етапі 4.", "info");
+  try {
+    await repository.deleteReader(id);
+    if (state.editingReaderId === id) resetReaderForm();
+    showMessage(`Читача «${reader.fullName}» видалено.`, "success");
+  } catch (error) {
+    showMessage(error.message);
+  }
+  await loadAll();
 }
 
 // =====================================================================
@@ -417,6 +515,10 @@ function initEvents() {
   // Заявки
   $("#request-search").addEventListener("input", renderRequests);
   $("#request-filter-status").addEventListener("change", renderRequests);
+  $("#requests-body").addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-next]");
+    if (button) changeStatus(button.dataset.id, button.dataset.next, button);
+  });
 
   // Книги
   ["#book-search", "#book-filter-category", "#book-filter-available", "#book-sort"].forEach((sel) => {
